@@ -1,3 +1,5 @@
+//https://glacial-savannah-47544.herokuapp.com/
+
 if(process.env.NODE_ENV !== "production"){
     require('dotenv').config();
 }
@@ -19,7 +21,7 @@ const userRoutes = require('./routes/users')
 const campgroundRoutes = require('./routes/campgrounds.js')
 const reviewRoutes = require('./routes/reviews.js')
 const dbUrl = process.env.DB_URL 
-const dbUrl2 = 'mongodb://localhost:27017/yelp-camp'
+const dbUrl2 = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp'
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 
