@@ -73,7 +73,7 @@ const secret = process.env.SECRET || 'apple';
 
 const store = new MongoDBStore({
     url : dbUrl2,
-    secret,
+    secret : 'apple',
     touchAfter: 27 * 60 * 60
 })
 
@@ -82,7 +82,7 @@ store.on("error" , function(e){
 })
 const sessionConfig = {
     store,
-    secret,
+    secret : 'apple',
     resave : false,
     saveUninitialized : true,
     cookie : {
