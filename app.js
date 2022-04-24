@@ -22,8 +22,9 @@ const campgroundRoutes = require('./routes/campgrounds.js')
 const reviewRoutes = require('./routes/reviews.js')
 const dbUrl = process.env.DB_URL 
 const dbUrl2 = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp'
-const MongoDBStore = require('connect-mongodb-session')(session);
 
+const MongoDBStore = require('connect-mongodb-session')(session);
+const MongoStore = require('connect-mongo');
 
 const Campground = require('./models/campground.js');
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
@@ -69,30 +70,42 @@ app.use(express.urlencoded({ extended : true }))
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname , 'public')))
 
-const secret = process.env.SECRET || 'apple';
+//session to stay login
+// const secret = process.env.SECRET || 'apple';
 
-const store = new MongoDBStore({
-    url : dbUrl2,
-    secret : 'apple',
-    touchAfter: 27 * 60 * 60
-})
+// const store = new MongoDBStore({
+//     url : dbUrl2,
+//     secret : 'apple',
+//     touchAfter: 27 * 60 * 60
+// })
 
-store.on("error" , function(e){
-    console.log("SESSION STORE ERROR" , e)
-})
-const sessionConfig = {
-    store,
-    secret : 'apple',
-    resave : false,
-    saveUninitialized : true,
-    cookie : {
-        httpOnly : true,
-        expires : Date.now() + 1000 * 60 * 60 * 24 * 7,
-        maxAge : 1000 * 60 * 60 * 24 * 7
-    }
-}
-app.use(session(sessionConfig))
+// store.on("error" , function(e){
+//     console.log("SESSION STORE ERROR" , e)
+// })
+// const sessionConfig = {
+//     store,
+//     secret : 'apple',
+//     resave : false,
+//     saveUninitialized : true,
+//     cookie : {
+//         httpOnly : true,
+//         expires : Date.now() + 1000 * 60 * 60 * 24 * 7,
+//         maxAge : 1000 * 60 * 60 * 24 * 7
+//     }
+// }
+// app.use(session(sessionConfig))
+
+app.use(session({
+    store: MongoStore.create({
+        mongoUrl: dbUrl2,
+        autoRemove: 'interval',
+        autoRemoveInterval: 10 // In minutes. Default
+      })
+}))
+
 app.use(flash());
+
+
 
 app.use(passport.initialize());
 app.use(passport.session());
